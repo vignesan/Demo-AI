@@ -1,68 +1,81 @@
 'use strict'
 
 exports.handle = function handle(client) {
-  const sayHello = client.createStep({
-    satisfied() {
-      return Boolean(client.getConversationState().helloSent)
-    },
+    const sayHello = client.createStep({
+        satisfied() {
+            return Boolean(client.getConversationState().helloSent)
+        },
 
-    prompt() {
-      client.addResponse('welcome')
-      client.addResponse('provide/documentation', {
-        documentation_link: 'http://docs.init.ai',
-      })
-      client.addResponse('provide/instructions')
-      client.updateConversationState({
-        helloSent: true
-      })
-      client.done()
-    }
-  })
+        prompt() {
+            client.addResponse('welcome')
+            client.addResponse('provide/documentation', {
+                documentation_link: 'http://docs.init.ai',
+            })
+            client.addResponse('provide/instructions')
+            client.updateConversationState({
+                helloSent: true
+            })
+            client.done()
+        }
+    })
 
-  const untrained = client.createStep({
-    satisfied() {
-      return false
-    },
+    const untrained = client.createStep({
+        satisfied() {
+            return false
+        },
 
-    prompt() {
-      client.addResponse('apology/untrained')
-     client.done()
-    }
-  })
+        prompt() {
+            client.addResponse('apology/untrained')
+            client.done()
+        }
+    })
 
-  const handleGreeting = client.createStep({
-    satisfied() {
-      return false
-    },
+    const handleGreeting = client.createStep({
+        satisfied() {
+            return false
+        },
 
-    prompt() {
-      client.addTextResponse('Hello world, I mean human')
-      client.done()
-    }
-  })
+        prompt() {
+            client.addTextResponse('Hello world, I mean human')
+            client.done()
+        }
+    })
+    const handleFeelings = client.createStep({
+        satisfied() {
+            return false
+        },
 
-  const handleGoodbye = client.createStep({
-    satisfied() {
-      return false
-    },
+        prompt() {
+            client.addTextResponse('Im good');
+            client.done()
+        }
+    })
 
-    prompt() {
-      client.addTextResponse('See you later!')
-      client.done()
-    }
-  })
+    const handleGoodbye = client.createStep({
+        satisfied() {
+            return false
+        },
 
-  client.runFlow({
-    classifications: {
-      goodbye: 'goodbye',
-      greeting: 'greeting'
-    },
-    streams: {
-      goodbye: handleGoodbye,
-      greeting: handleGreeting,
-      main: 'onboarding',
-      onboarding: [sayHello],
-      end: [untrained]
-    }
-  })
+        prompt() {
+            client.addTextResponse('See you later!')
+            client.done()
+        }
+    })
+
+    client.runFlow({
+        classifications: {
+            goodbye: 'goodbye',
+            greeting: 'greeting',
+            feelings: 'feelings',
+        },
+        streams: {
+            goodbye: handleGoodbye,
+            greeting: handleGreeting,
+            feelings: handleFeelings,
+            main: 'onboarding',
+            onboarding: [sayHello],
+            feelings: [handleFeelings],
+            end: [untrained],
+        }
+    })
 }
