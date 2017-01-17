@@ -40,7 +40,7 @@ exports.handle = function handle(client) {
             client.done()
         }
     })
-    const handleFeelings = client.createStep({
+    const handleHuman = client.createStep({
         satisfied() {
             return false
         },
@@ -66,15 +66,15 @@ exports.handle = function handle(client) {
         classifications: {
             goodbye: 'goodbye',
             greeting: 'greeting',
-            feelings: 'feelings',
+            human:'human',
         },
         streams: {
             goodbye: handleGoodbye,
             greeting: handleGreeting,
-            feelings: handleFeelings,
+            human: handleHuman,
             main: 'onboarding',
             onboarding: [sayHello],
-            feelings: [handleFeelings],
+            human: [handleHuman],
             end: [untrained],
         }
     })
